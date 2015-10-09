@@ -20,5 +20,5 @@ void setup() {
 void loop() {
   //Send a string just like that:
   myTransmitter.sendString(strToSend);
-  Serial.println("les");
+  Serial.println("Sent");
 }

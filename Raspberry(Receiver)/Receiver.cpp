@@ -14,7 +14,7 @@ Receiver::Receiver(){
 	this->oldNumPacket = 0;
 	this->isString = false;
 	this->oldValue = (char *) malloc(lengthFrame);
-	this->theStr = "";
+	this->theStr = (char *) malloc(2);
     if(wiringPiSetup() == -1)
 		printf("Error in initializing wiringpi\n");
     this->mySwitch = RCSwitch();
@@ -99,7 +99,7 @@ void Receiver::onDataReceived(int oid, int numPacket, char * rawData){
 			if (request == 2) { 
 				// Start message
 				//printf("start string \n");
-				this->theStr = "";
+				this->theStr = (char *) malloc(2);
 				this->oldNumPacket = 0;
 				this->isString = true;
 			} else if(request == 3){
@@ -119,10 +119,10 @@ void Receiver::onDataReceived(int oid, int numPacket, char * rawData){
 				//printf("%d ", numPacket);
 				if(numPacket == this->oldNumPacket+1 || (oldNumPacket == 31 && numPacket == 1) ){
 					this->oldNumPacket++;
-					this->theStr += data;
+					this->theStr = this->concat(theStr, data);
 				}else{
 					//printf("Error in reception \n");
-					this->theStr = "";
+					this->theStr = (char *) malloc(2);
 					this->oldNumPacket = 0;
 					this->isString = false;
 				}
@@ -131,13 +131,13 @@ void Receiver::onDataReceived(int oid, int numPacket, char * rawData){
 	}
 }
 
-std::string Receiver::receiveData(){
+char * Receiver::receiveData(){
 
 	// printf("################# \n");
 	// printf("#   Receiving   # \n");
 	// printf("################# \n");
 	this->isString = false;
-	this->theStr = "";
+	this->theStr =  (char *) malloc(2);
 	this->oldNumPacket = 0;
 	strcpy(this->oldValue, "00000000000000000000000000000000");
 	do{

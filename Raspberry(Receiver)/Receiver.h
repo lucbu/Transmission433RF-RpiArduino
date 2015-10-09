@@ -5,8 +5,6 @@
 #include "RCSwitch.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <string>
-#include <iostream>
 #include <limits.h>
 #include <string.h>
 
@@ -14,7 +12,7 @@ class Receiver {
 
 	public:
 		Receiver();
-		std::string receiveData();
+		char * receiveData();
 		void setPin(int pin);
 		void setOID(int oid);
 
@@ -28,7 +26,7 @@ class Receiver {
 		int OID;
 		bool isString;
 		char * oldValue;
-		std::string theStr;
+		char * theStr;
 		
 		//Function
 		void onDataReceived(int oid, int numPacket, char * rawData);
