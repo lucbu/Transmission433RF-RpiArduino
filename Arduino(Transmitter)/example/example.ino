@@ -8,7 +8,7 @@ char * strToSend = "Hello";
 void setup() {
   Serial.begin(9600);
   myTransmitter = Transmitter();
-  myTransmitter.setDelay(0);
+  myTransmitter.setDelay(1);
   /*
   You can modify these properties
   myTransmitter.setPin(10);

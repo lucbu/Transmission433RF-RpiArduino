@@ -43,9 +43,7 @@ bool Transmitter::isSending(){
 void Transmitter::sendString(char *str) {
 	this->sending = true;
 	uint8_t cnt = 0;
-	char * beginString = createFrame(this->OID, 0, int2bin(2, sizeData));
-	this->send(beginString);
-	free(beginString);
+	this->send(createFrame(this->OID, 0, int2bin(2, sizeData)));
 	uint8_t i = 0;
 	for (; i < strlen(str); i = i+2){
 		char * data = (char *) malloc(sizeDataByte);
@@ -65,10 +63,10 @@ void Transmitter::sendString(char *str) {
 		char * frame = createFrame(this->OID, cnt, data);
 		this->send(frame);
 		free(data1);free(data);free(frame);
+		//Serial.println(cnt);
 	}
-	char * endString = createFrame(this->OID, 0, concat(int2bin(cnt, sizeChar), int2bin(3, sizeChar)));
-	this->send(endString);
-	free(str);free(endString);free(&cnt);free(&i);
+	this->send(createFrame(this->OID, 0, concat(int2bin(cnt, sizeChar), int2bin(3, sizeChar))));
+	free(str);free(&cnt);free(&i);
 	this->sending = false;
 }
 
@@ -81,9 +79,9 @@ char * Transmitter::createFrame(int oid, int numPacket, char * data){
   char * oidBin = this->int2bin(oid, sizeOID);
   char * numPacketBin = this->int2bin(numPacket, sizeNumPacket);
   char * frame = this->concat(oidBin, numPacketBin);
-  free(oidBin);free(numPacketBin);
   frame = this->concat(frame, data);
   frame = this->setParityBit(frame);
+  free(oidBin);free(numPacketBin);
   return frame;
 }
  
