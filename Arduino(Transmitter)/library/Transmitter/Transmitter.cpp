@@ -40,10 +40,19 @@ bool Transmitter::isSending(){
 	return this->sending;
 }
 
+void Transmitter::sendCommand(char cmd){
+	this->sending = true;
+	char * toSend = concat(int2bin(1, sizeChar), char2bin(cmd));
+	char * frame = createFrame(this->OID, 0, toSend);
+	this->send(frame);
+	free(frame);free(toSend);
+	this->sending = false;
+}
+
 void Transmitter::sendString(char *str) {
 	this->sending = true;
 	uint8_t cnt = 0;
-	char * beginString = createFrame(this->OID, 0, int2bin(2, sizeData));
+	char * beginString = this->createFrame(this->OID, 0, concat(int2bin(2, sizeChar), int2bin(0, sizeChar)));
 	this->send(beginString);
 	free(beginString);
 	uint8_t i = 0;
@@ -53,20 +62,20 @@ void Transmitter::sendString(char *str) {
 		strcpy(data, data1);
 		if(i+1 < strlen(str)){
 			char * data2 = int2bin(str[i+1], sizeChar);
-			data = concat(data, data2);
+			data = this->concat(data, data2);
 			free(data2);
 		}else{
-			data = concat(data, "00000000");
+			data = this->concat(data, "00000000");
 		}
 		if(cnt < 31)
 			cnt++;
 		else
 			cnt = 1;
-		char * frame = createFrame(this->OID, cnt, data);
+		char * frame = this->createFrame(this->OID, cnt, data);
 		this->send(frame);
 		free(data1);free(data);free(frame);
 	}
-	char * endString = createFrame(this->OID, 0, concat(int2bin(cnt, sizeChar), int2bin(3, sizeChar)));
+	char * endString = this->createFrame(this->OID, 0, this->concat(this->int2bin(3, sizeChar), this->int2bin(cnt, sizeChar)));
 	this->send(endString);
 	free(str);free(endString);free(&cnt);free(&i);
 	this->sending = false;
@@ -95,16 +104,16 @@ char * Transmitter::setParityBit(char * frame){
     if (frame[i] == '1')
         numberOfOnes++;
   }
-  
   if (numberOfOnes % 2 == 0)
     parityBit = "0";
 
   frame = this->concat(frame, parityBit);
+  //free(&numberOfOnes);free(parityBit);
   return frame;
 }
 
-char * Transmitter::char2bin(char * c){
-  return this->int2bin((int) c, 8);
+char * Transmitter::char2bin(char c){
+  return this->int2bin((int) c, sizeChar);
 }
 
 char * Transmitter::int2bin(int i, int size)

@@ -15,6 +15,8 @@ class Receiver {
 		char * receiveData();
 		void setPin(int pin);
 		void setOID(int oid);
+		bool getIsCommand();
+		bool getIsString();
 
 		
 	private:
@@ -25,7 +27,9 @@ class Receiver {
 		int oldNumPacket;
 		int OID;
 		bool isString;
+		bool isCommand;
 		char * oldValue;
+		char * theCmd;
 		char * theStr;
 		
 		//Function

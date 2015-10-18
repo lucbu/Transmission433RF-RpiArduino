@@ -13,7 +13,11 @@ int main(int argc, char *argv[]) {
 	while(1){
 		//This will fulfill 'example' with the received string
 		char * example = myReceiver.receiveData();
-		printf("Message: %s\n", example);
+		if(myReceiver.getIsString()){
+			printf("Message: %s\n", example);
+		}else if(myReceiver.getIsCommand()){
+			printf("Commande: %s\n", example);
+		}
 	}
 	
 	exit(0);

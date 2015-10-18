@@ -9,6 +9,7 @@
 class Transmitter{
 
 	public :
+		void sendCommand(char cmd);
 		void sendString(char *str);
 		Transmitter();
 		void setDelay(int delay);
@@ -25,7 +26,7 @@ class Transmitter{
 		void send(char *str);
 		char * createFrame(int oid, int numPacket, char * data);
 		char * setParityBit(char * frame);
-		char * char2bin(char * c);
+		char * char2bin(char c);
 		char * int2bin(int i, int size);
 		char * concat(char * str1, char * str2);
 };

@@ -13,8 +13,10 @@ Receiver::Receiver(){
 	this->received = false;
 	this->oldNumPacket = 0;
 	this->isString = false;
+	this->isCommand = false;
 	this->oldValue = (char *) malloc(lengthFrame);
 	this->theStr = (char *) malloc(2);
+	this->theCmd = (char *) malloc(lengthChar);;
     if(wiringPiSetup() == -1)
 		printf("Error in initializing wiringpi\n");
     this->mySwitch = RCSwitch();
@@ -87,6 +89,14 @@ char * Receiver::concat(char * str1, char * str2){
   return str3;
 }
 
+bool Receiver::getIsString(){
+	return this->isString;
+}
+
+bool Receiver::getIsCommand(){
+	return this->isCommand;
+}
+
 void Receiver::onDataReceived(int oid, int numPacket, char * rawData){
 	if(oid == this->OID){
 		if(numPacket == 0){
@@ -95,19 +105,26 @@ void Receiver::onDataReceived(int oid, int numPacket, char * rawData){
 			char * rawDataPart1 = getFromFrame(rawData, lengthChar, 0);
 			char * rawDataPart2 = getFromFrame(rawData, lengthChar, lengthChar);
 			
-			int request = intFromBinary(rawDataPart2);
-			if (request == 2) { 
-				// Start message
-				//printf("start string \n");
+			int request = intFromBinary(rawDataPart1);
+			if(request == 1){
+				// Command
+				this->received = true;
+				this->isCommand = true;
 				this->theStr = (char *) malloc(2);
 				this->oldNumPacket = 0;
+				this->isString = false;
+				this->theCmd = dataFromBinary(rawDataPart2);
+			}else if (request == 2) { 
+				// Start message
+				this->theStr = (char *) malloc(2);
+				this->oldNumPacket = 0;
+				this->isCommand = false;
 				this->isString = true;
-			} else if(request == 3){
-				int param = intFromBinary(rawDataPart1);
+			}else if(request == 3){
+				this->isCommand = false;
+				int param = intFromBinary(rawDataPart2);
 				if(param == this->oldNumPacket){
-					//printf("end string \n");
 					// End message
-					//std::cout  << "Received message = " << this->theStr << "\n";
 					this->received = true;
 				}else{
 					//printf("Error \n");
@@ -137,6 +154,7 @@ char * Receiver::receiveData(){
 	// printf("#   Receiving   # \n");
 	// printf("################# \n");
 	this->isString = false;
+	this->isCommand = false;
 	this->theStr =  (char *) malloc(2);
 	this->oldNumPacket = 0;
 	strcpy(this->oldValue, "00000000000000000000000000000000");
@@ -164,6 +182,10 @@ char * Receiver::receiveData(){
 		  }
 	}while(!this->received);
 	this->received = false;
-	return this->theStr;
+	if(this->isCommand){
+		return this->theCmd;
+	}else if(this->isString){
+		return this->theStr;
+	}
 }
 

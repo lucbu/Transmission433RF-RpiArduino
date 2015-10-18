@@ -3,7 +3,7 @@
 Transmitter myTransmitter;
 
 // The char to transmit
-char * strToSend = "Hello";
+char * strToSend = "he";
 
 void setup() {
   Serial.begin(9600);
@@ -14,11 +14,10 @@ void setup() {
   myTransmitter.setPin(10);
   myTransmitter.setOID(288);
   */
-
 }
 
 void loop() {
   //Send a string just like that:
   myTransmitter.sendString(strToSend);
-  Serial.println("Sent");
+  Serial.println(F("cnd"));
 }
